@@ -1,0 +1,1090 @@
+% \chapter{中国科学院大学学位论文撰写要求}
+\begin{appendices}\label{sec:appendices}
+    \section*{附录代码段合集} \label{sec:testlistings}
+    \begin{lstlisting}[
+        language=python,
+        label=code:catch,
+        caption=自动抓取字幕
+    ]
+    # coding:utf-8
+    import sys
+    reload(sys)
+    sys.setdefaultencoding( "utf-8" )
+    
+    import scrapy
+    from w3lib.html import remove_tags
+    from subtitle_crawler.items import SubtitleCrawlerItem
+    
+    class SubTitleSpider(scrapy.Spider):
+        name = "subtitle"
+        allowed_domains = ["zimuku.net"]
+        start_urls = [
+                "http://www.zimuku.net/search?q=&t=onlyst&ad=1&p=20",
+                "http://www.zimuku.net/search?q=&t=onlyst&ad=1&p=21",
+                "http://www.zimuku.net/search?q=&t=onlyst&ad=1&p=22",
+        ]
+    
+        def parse(self, response):
+            hrefs = response.selector.xpath('//div[contains(@class, "persub")]/h1/a/@href').extract()
+            for href in hrefs:
+                url = response.urljoin(href)
+                request = scrapy.Request(url, callback=self.parse_detail)
+                yield request
+    
+        def parse_detail(self, response):
+            url = response.selector.xpath('//li[contains(@class, "dlsub")]/div/a/@href').extract()[0]
+            print "processing: ", url
+            request = scrapy.Request(url, callback=self.parse_file)
+            yield request
+    
+        def parse_file(self, response):
+            body = response.body
+            item = SubtitleCrawlerItem()
+            item['url'] = response.url
+            item['body'] = body
+            return item
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:catchm,
+        caption=主函数
+    ]
+    class SubtitleCrawlerPipeline(object):
+        def process_item(self, item, spider):
+            url = item['url']
+            file_name = url.replace('/','_').replace(':','_')
+            fp = open('result/'+file_name, 'w')
+            fp.write(item['body'])
+            fp.close()
+            return item
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_ass,
+        caption=取出扩展名为ass的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.ass"):
+        i=i+1
+        newfilename = "ass/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_Irc,
+        caption=取出扩展名为Irc的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.LRC"):
+        i=i+1
+        newfilename = "lrc/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_smi,
+        caption=取出扩展名为smi的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.SMI"):
+        i=i+1
+        newfilename = "smi/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_srt,
+        caption=取出扩展名为srt的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.SRT"):
+        i=i+1
+        newfilename = "srt/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_ssa,
+        caption=取出扩展名为ssa的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.ssa"):
+        i=i+1
+        newfilename = "ssa/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_str,
+        caption=取出扩展名为str的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.str"):
+        i=i+1
+        newfilename = "str/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_sup,
+        caption=取出扩展名为sup的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.sup"):
+        i=i+1
+        newfilename = "sup/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:mv_vtt,
+        caption=取出扩展名为vtt的文件
+    ]
+    import glob
+    import os
+    import fnmatch
+    import shutil
+    import sys
+    
+    
+    def iterfindfiles(path, fnexp):
+        for root, dirs, files in os.walk(path):
+            for filename in fnmatch.filter(files, fnexp):
+                yield os.path.join(root, filename)
+    
+    
+    i=0
+    for filename in iterfindfiles(r"./input/", "*.vtt"):
+        i=i+1
+        newfilename = "vtt/" + str(i) + "_" + os.path.basename(filename)
+        print filename + " <===> " + newfilename
+        shutil.move(filename, newfilename)
+        #sys.exit(-1)
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:encode,
+        caption=编码识别与转码
+    ]
+    import chardet
+    import sys
+    import os
+    
+    if __name__ == '__main__':
+        if len(sys.argv) == 2:
+            for root, dirs, files in os.walk(sys.argv[1]):
+                for file in files:
+                    file_path = root + "/" + file
+                    f = open(file_path,'r')
+                    data = f.read()
+                    f.close()
+                    encoding = chardet.detect(data)["encoding"]
+                    if encoding not in ("UTF-8-SIG", "UTF-16LE", "utf-8", "ascii"):
+                        try:
+                            gb_content = data.decode("gb18030")
+                            gb_content.encode('utf-8')
+                            f = open(file_path, 'w')
+                            f.write(gb_content.encode('utf-8'))
+                            f.close()
+                        except:
+                            print "except:", file_path
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:extract,
+        caption=筛选中文
+    ]
+    # coding:utf-8
+    import chardet
+    import os
+    import re
+    
+    cn=ur"([\u4e00-\u9fa5]+)"
+    pattern_cn = re.compile(cn)
+    jp1=ur"([\u3040-\u309F]+)"
+    pattern_jp1 = re.compile(jp1)
+    jp2=ur"([\u30A0-\u30FF]+)"
+    pattern_jp2 = re.compile(jp2)
+    
+    for root, dirs, files in os.walk("./srt"):
+        file_count = len(files)
+        if file_count > 0:
+            for index, file in enumerate(files):
+                f = open(root + "/" + file, "r")
+                content = f.read()
+                f.close()
+                encoding = chardet.detect(content)["encoding"]
+                try:
+                    for sentence in content.decode(encoding).split('\n'):
+                        if len(sentence) > 0:
+                            match_cn =  pattern_cn.findall(sentence)
+                            match_jp1 =  pattern_jp1.findall(sentence)
+                            match_jp2 =  pattern_jp2.findall(sentence)
+                            sentence = sentence.strip()
+                            if len(match_cn)>0 and len(match_jp1)==0 and len(match_jp2) == 0 and len(sentence)>1 and len(sentence.split(' ')) < 10:
+                                print sentence.encode('utf-8')
+                except:
+                    continue
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:filter,
+        caption=内容过滤
+    ]
+    # coding:utf-8
+    import sys
+    import re
+    import chardet
+    
+    if __name__ == '__main__':
+        #illegal=r"([\u2000-\u2010]+)"
+        illegal=r"([\u0000-\u2010]+)"
+        pattern_illegals = [re.compile(r"([\u2000-\u2010]+)"), re.compile(r"([\u0090-\u0099]+)")]
+        filters = ["字幕", "时间轴:", "校对:", "翻译:", "后期:", "监制:"]
+        filters.append("时间轴：")
+        filters.append("校对：")
+        filters.append("翻译：")
+        filters.append("后期：")
+        filters.append("监制：")
+        filters.append("禁止用作任何商业盈利行为")
+        filters.append("http")
+        htmltagregex = re.compile(r'<[^>]+>',re.S)
+        brace_regex = re.compile(r'\{.*\}',re.S)
+        slash_regex = re.compile(r'\\\w',re.S)
+        repeat_regex = re.compile(r'[-=]{10}',re.S)
+        f = open("./corpus/all.out", "r")
+        count=0
+        while True:
+            line = f.readline()
+            if line:
+                line = line.strip()
+    
+                # 编码识别，不是utf-8就过滤
+                gb_content = ''
+                try:
+                    gb_content = line.decode("utf-8")
+                except Exception as e:
+                    sys.stderr.write("decode error:  ", line)
+                    continue
+    
+                # 中文识别，不是中文就过滤
+                need_continue = False
+                for pattern_illegal in pattern_illegals:
+                    match_illegal = pattern_illegal.findall(gb_content)
+                    if len(match_illegal) > 0:
+                        sys.stderr.write("match_illegal error: %s\n" % line)
+                        need_continue = True
+                        break
+                if need_continue:
+                    continue
+    
+                # 关键词过滤
+                need_continue = False
+                for filter in filters:
+                    try:
+                        line.index(filter)
+                        sys.stderr.write("filter keyword of %s %s\n" % (filter, line))
+                        need_continue = True
+                        break
+                    except:
+                        pass
+                if need_continue:
+                    continue
+    
+                # 去掉剧集信息
+                if re.match('.*第.*季.*', line):
+                    sys.stderr.write("filter copora %s\n" % line)
+                    continue
+                if re.match('.*第.*集.*', line):
+                    sys.stderr.write("filter copora %s\n" % line)
+                    continue
+                if re.match('.*第.*帧.*', line):
+                    sys.stderr.write("filter copora %s\n" % line)
+                    continue
+    
+                # 去html标签
+                line = htmltagregex.sub('',line)
+    
+                # 去花括号修饰
+                line = brace_regex.sub('', line)
+    
+                # 去转义
+                line = slash_regex.sub('', line)
+    
+                # 去重复
+                new_line = repeat_regex.sub('', line)
+                if len(new_line) != len(line):
+                    continue
+    
+                # 去特殊字符
+                line = line.replace('-', '').strip()
+    
+                if len(line) > 0:
+                    sys.stdout.write("%s\n" % line)
+                count+=1
+            else:
+                break
+        f.close()
+        pass
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=java,
+        label=code:inject,
+        caption=页面注入
+    ]
+    public void injectQqSettingLayout() {
+        XposedHelpers.findAndHookConstructor(QQSettingMe, classLoader,
+                BaseActivity,
+                QQAppInterface,
+                FrameHelperActivity, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        Field viewsField = XposedUtil.getField(param.thisObject, "a", View[].class);
+                        if (viewsField != null) {
+                            View[] views = (View []) viewsField.get(param.thisObject);
+                            final LinearLayout linearLayout = (LinearLayout) views[0].getParent();
+                            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+                            LinearLayout injectLayout = (LinearLayout) layoutInflater.inflate(Setting_Layout_Id, null);
+                            ((TextView)injectLayout.findViewById(Setting_TextView_Id)).setText("QQ机器人");
+                            injectLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                                    ComponentName cn = new ComponentName("cn.EvilCalf.ECBot", "cn.EvilCalf.ECBot.MainActivity");
+                                    intent.setComponent(cn);
+                                    linearLayout.getContext().startActivity(intent);
+                                }
+                            });
+                            linearLayout.addView(injectLayout);
+                        }
+                    }
+                });
+    }
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=java,
+        label=code:socket,
+        caption=SOCKET
+    ]
+    package cn.EvilCalf.ECBot;
+    import java.io.IOException;
+    import java.net.DatagramPacket;
+    import java.net.DatagramSocket;
+    import java.net.InetAddress;
+    import java.net.SocketException;
+    import java.net.UnknownHostException;
+    
+    public class socket
+    {
+        protected socket()
+        {}
+        public static void connectServerWithUDPSocket(String str) {
+    
+            DatagramSocket socket;
+            try {
+                socket = new DatagramSocket(1985);
+                InetAddress serverAddress = InetAddress.getByName("120.78.197.104");
+                byte data[] = str.getBytes();
+                DatagramPacket packet = new DatagramPacket(data, data.length ,serverAddress ,10025);
+                socket.send(packet);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        public static String ReceiveServerSocketData() {
+            DatagramSocket socket;
+            String result = null;
+            try {
+                socket = new DatagramSocket(1985);
+                byte data[] = new byte[4 * 1024];
+                DatagramPacket packet = new DatagramPacket(data, data.length);
+                socket.receive(packet);
+                result = new String(packet.getData(), packet.getOffset(),
+                        packet.getLength());
+                socket.close();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+    }
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=java,
+        label=code:commnucation,
+        caption=消息交互
+    ]
+    package cn.EvilCalf.ECBot.xposed;
+
+    import android.content.Context;
+    
+    import com.zhy.http.okhttp.callback.StringCallback;
+    
+    import java.util.ArrayList;
+    import java.util.Map;
+    
+    import cn.EvilCalf.ECBot.robot.Robot;
+    import cn.EvilCalf.ECBot.xposed.utils.XLogUtil;
+    import cn.EvilCalf.ECBot.xposed.utils.XPreferenceUtil;
+    import cn.EvilCalf.ECBot.xposed.utils.XposedUtil;
+    import de.robv.android.xposed.XC_MethodHook;
+    import de.robv.android.xposed.XposedHelpers;
+    import okhttp3.Call;
+    
+    import static cn.EvilCalf.ECBot.Common.BaseApplicationImpl;
+    import static cn.EvilCalf.ECBot.Common.ChatActivityFacade;
+    import static cn.EvilCalf.ECBot.Common.MessageHandlerUtils;
+    import static cn.EvilCalf.ECBot.Common.MessageRecord;
+    import static cn.EvilCalf.ECBot.Common.QQAppInterface;
+    import static cn.EvilCalf.ECBot.Common.SendMsgParams;
+    import static cn.EvilCalf.ECBot.Common.SessionInfo;
+    import static cn.EvilCalf.ECBot.xposed.utils.XPreferenceUtil.getApiKey;
+    import static cn.EvilCalf.ECBot.xposed.utils.XPreferenceUtil.getKeyReply;
+    import static de.robv.android.xposed.XposedHelpers.callMethod;
+    import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
+    import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+    import static de.robv.android.xposed.XposedHelpers.findClass;
+    import static de.robv.android.xposed.XposedHelpers.getObjectField;
+    import static de.robv.android.xposed.XposedHelpers.newInstance;
+    
+    
+    
+    public class MessageUtil extends BaseHook {
+    
+        private Object sApplication;
+        private Context mContext;
+    
+        private MessageUtil(ClassLoader classLoader) {
+            super(classLoader);
+    
+        }
+    
+        MessageUtil(ClassLoader classLoader, Context context) {
+            super(classLoader);
+            mContext = context;
+        }
+    
+        public void initAutoReply() {
+            sApplication = callStaticMethod(findClass(BaseApplicationImpl, classLoader), "getApplication");
+            findAndHookMethod(MessageHandlerUtils, classLoader, "a",
+                    QQAppInterface,
+                    MessageRecord,
+                    boolean.class, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            XLogUtil.d("总开关", XPreferenceUtil.getMasterSwitch() + "");
+                            if (!XPreferenceUtil.getMasterSwitch()) return;
+    
+                            final String frienduin = getObjectField(param.args[1], "frienduin").toString();
+                            final String selfuin = getObjectField(param.args[1], "selfuin").toString();
+                            final int istroop = (int) getObjectField(param.args[1], "istroop");
+                            final String senderuin = getObjectField(param.args[1], "senderuin").toString();
+                            final String msg = getObjectField(param.args[1], "msg").toString();
+                            boolean isread = (boolean) getObjectField(param.args[1], "isread");
+    
+                            XLogUtil.d("frienduin", frienduin);
+                            XLogUtil.d("selfuin", selfuin);
+                            XLogUtil.d("senderuin", senderuin);
+    
+                            String[] whiteList = XPreferenceUtil.getWhiteList();
+    
+                            if (whiteList.length != 0 && !senderuin.equals(selfuin)) {
+                                if (XPreferenceUtil.getNoReplyTroop() && istroop == 1) return;
+                                iteratorWhiteList(frienduin, selfuin, msg, senderuin, istroop, isread, whiteList);
+                            }
+                        }
+                    });
+        }
+    
+        private void iteratorWhiteList(String frienduin, String selfuin, String msg, String senderuin, int istroop, boolean isread, String[] list) {
+            for (String s : list) {
+                if (frienduin.equals(s) && !isread && !frienduin.equals(selfuin)) {
+                    XLogUtil.d("MessageUtil", "iteratorWhiteList is running...");
+                    ArrayList<Map<String, String>> keyReply = getKeyReply();
+                    if (keyReply != null && keyReply.size() != 0) {
+                        for (Map<String, String> stringMap: keyReply){
+                            if (stringMap.get("content").trim().equals(msg)) {
+                                send(frienduin, selfuin, istroop, stringMap.get("reply_content"));
+                                return;
+                            }
+                        }
+                    }
+                    Robot robot = new Robot(Robot.RobotType.TULING);
+                    robot.setCallback(new ReplyCallback(frienduin, selfuin, istroop));
+                    robot.init(getApiKey(), msg, senderuin);
+                }
+            }
+        }
+    
+        private void send(String frienduin, String selfuin, int istroop, String s) {
+            Object qqAppInterface = callMethod(sApplication, "getAppRuntime", selfuin);
+            Object sessionInfo = newInstance(findClass(SessionInfo, classLoader));
+            Object sendMsgParams = newInstance(findClass(SendMsgParams, classLoader));
+            XposedUtil.setField(sessionInfo, "a", frienduin, String.class);
+            XposedUtil.setField(sessionInfo, "a", istroop, int.class);
+            callStaticMethod(XposedHelpers.findClass(ChatActivityFacade, classLoader), "a", qqAppInterface, mContext, sessionInfo, s, new ArrayList<>(), sendMsgParams);
+        }
+    
+        private class ReplyCallback extends StringCallback {
+    
+            private String frienduin;
+            private String selfuin;
+            private int istroop;
+    
+            ReplyCallback(String frienduin, String selfuin, int istroop) {
+                this.frienduin = frienduin;
+                this.selfuin = selfuin;
+                this.istroop = istroop;
+            }
+            @Override
+            public void onError(Call call, Exception e, int id) {
+    
+            }
+    
+            @Override
+            public void onResponse(String response, int id) {
+                send(frienduin, selfuin, istroop, Robot.tulingReply(response));
+            }
+        }
+    }
+    
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=python,
+        label=code:word2rec,
+        caption=分词并转化为词向量
+    ]
+    # coding:utf-8
+import sys
+import jieba
+
+
+class WordToken(object):
+    def __init__(self):
+        self.START_ID = 4
+        self.word2id_dict = {}
+        self.id2word_dict = {}
+
+    def load_file_list(self, file_list):
+        global index
+        words_count = {}
+        for file in file_list:
+            with open(file, 'r', encoding='UTF-8') as file_object:
+                for line in file_object.readlines():
+                    line = line.strip()
+                    seg_list = jieba.cut(line)
+                    for str in seg_list:
+                        if str in words_count:
+                            words_count[str] = words_count[str] + 1
+                        else:
+                            words_count[str] = 1
+
+        sorted_list = [[v[1], v[0]] for v in words_count.items()]
+        sorted_list.sort(reverse=True)
+        for index, item in enumerate(sorted_list):
+            word = item[1]
+            self.word2id_dict[word] = self.START_ID + index
+            self.id2word_dict[self.START_ID + index] = word
+        return index
+
+    def word2id(self, word):
+        if not isinstance(word, str):
+            print("Exception: error word not unicode")
+            sys.exit(1)
+        if word in self.word2id_dict:
+            return self.word2id_dict[word]
+        else:
+            return None
+
+    def id2word(self, i_d):
+        i_d = int(i_d)
+        if i_d in self.id2word_dict:
+            return self.id2word_dict[i_d]
+        else:
+            return None
+
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=java,
+        label=code:inject,
+        caption=页面注入
+    ]
+    public void injectQqSettingLayout() {
+        XposedHelpers.findAndHookConstructor(QQSettingMe, classLoader,
+                BaseActivity,
+                QQAppInterface,
+                FrameHelperActivity, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        Field viewsField = XposedUtil.getField(param.thisObject, "a", View[].class);
+                        if (viewsField != null) {
+                            View[] views = (View []) viewsField.get(param.thisObject);
+                            final LinearLayout linearLayout = (LinearLayout) views[0].getParent();
+                            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+                            LinearLayout injectLayout = (LinearLayout) layoutInflater.inflate(Setting_Layout_Id, null);
+                            ((TextView)injectLayout.findViewById(Setting_TextView_Id)).setText("QQ机器人");
+                            injectLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                                    ComponentName cn = new ComponentName("cn.EvilCalf.ECBot", "cn.EvilCalf.ECBot.MainActivity");
+                                    intent.setComponent(cn);
+                                    linearLayout.getContext().startActivity(intent);
+                                }
+                            });
+                            linearLayout.addView(injectLayout);
+                        }
+                    }
+                });
+    }
+    \end{lstlisting}
+    \begin{lstlisting}[
+        language=java,
+        label=code:get,
+        caption=获取域
+    ]
+    public static Object getObjectField(Object obj, String fieldName) {
+		try {
+			return findField(obj.getClass(), fieldName).get(obj);
+		} catch (IllegalAccessException e) {
+			// should not happen
+			XposedBridge.log(e);
+			throw new IllegalAccessError(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			throw e;
+		}
+    }
+    public static Field findField(Class<?> clazz, String fieldName) {
+		String fullFieldName = clazz.getName() + '#' + fieldName;
+
+		if (fieldCache.containsKey(fullFieldName)) {
+			Field field = fieldCache.get(fullFieldName);
+			if (field == null)
+				throw new NoSuchFieldError(fullFieldName);
+			return field;
+		}
+
+		try {
+			Field field = findFieldRecursiveImpl(clazz, fieldName);
+			field.setAccessible(true);
+			fieldCache.put(fullFieldName, field);
+			return field;
+		} catch (NoSuchFieldException e) {
+			fieldCache.put(fullFieldName, null);
+			throw new NoSuchFieldError(fullFieldName);
+		}
+	}
+    public static Field getField(Object object, String fieldName, Type type) {
+        Field[] fields = object.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType() == type && field.getName().equals(fieldName)) {
+                field.setAccessible(true);
+                return field;
+            }
+        }
+        return null;
+    }
+    \end{lstlisting}
+\begin{lstlisting}[
+    language=java,
+    label=code:train,
+    caption=训练模型
+]
+# coding:utf-8
+import numpy as np
+import tensorflow as tf
+from tensorflow.contrib.legacy_seq2seq.python.ops import seq2seq
+import word_token
+import jieba
+import win_unicode_console
+
+win_unicode_console.enable()
+
+input_seq_len = 5
+output_seq_len = 5
+PAD_ID = 0
+GO_ID = 1
+EOS_ID = 2
+size = 8
+init_learning_rate = 1
+wordToken = word_token.WordToken()
+max_token_id = wordToken.load_file_list(['question', 'answer'])
+num_encoder_symbols = max_token_id + 5
+num_decoder_symbols = max_token_id + 5
+
+
+def get_id_list_from(sentence):
+    sentence_id_list = []
+    seg_list = jieba.cut(sentence)
+    for str in seg_list:
+        id = wordToken.word2id(str)
+        if id:
+            sentence_id_list.append(wordToken.word2id(str))
+    return sentence_id_list
+
+
+def get_train_set():
+    global num_encoder_symbols, num_decoder_symbols
+    train_set = []
+    with open('question', 'r', encoding='UTF-8') as question_file:
+        with open('answer', 'r', encoding='UTF-8') as answer_file:
+            while True:
+                question = question_file.readline()
+                answer = answer_file.readline()
+                if question and answer:
+                    question = question.strip()
+                    answer = answer.strip()
+
+                    question_id_list = get_id_list_from(question)
+                    answer_id_list = get_id_list_from(answer)
+                    answer_id_list.append(EOS_ID)
+                    train_set.append([question_id_list, answer_id_list])
+                else:
+                    break
+    return train_set
+
+
+def get_samples(train_set):
+    raw_encoder_input = []
+    raw_decoder_input = []
+    for sample in train_set:
+        raw_encoder_input.append([PAD_ID] * (input_seq_len - len(sample[0])) + sample[0])
+        raw_decoder_input.append([GO_ID] + sample[1] + [PAD_ID] * (output_seq_len - len(sample[1]) - 1))
+
+    encoder_inputs = []
+    decoder_inputs = []
+    target_weights = []
+
+    for length_idx in range(input_seq_len):
+        encoder_inputs.append(
+            np.array([encoder_input[length_idx] for encoder_input in raw_encoder_input], dtype=np.int32))
+    for length_idx in range(output_seq_len):
+        decoder_inputs.append(
+            np.array([decoder_input[length_idx] for decoder_input in raw_decoder_input], dtype=np.int32))
+        target_weights.append(np.array([
+            0.0 if length_idx == output_seq_len - 1 or decoder_input[length_idx] == PAD_ID else 1.0 for decoder_input in
+            raw_decoder_input
+        ], dtype=np.float32))
+    return encoder_inputs, decoder_inputs, target_weights
+
+
+def get_model(feed_previous=False):
+    learning_rate = tf.Variable(float(init_learning_rate), trainable=False, dtype=tf.float32)
+    learning_rate_decay_op = learning_rate.assign(learning_rate * 0.9)
+
+    encoder_inputs = []
+    decoder_inputs = []
+    target_weights = []
+    for i in range(input_seq_len):
+        encoder_inputs.append(tf.placeholder(tf.int32, shape=[None], name="encoder{0}".format(i)))
+    for i in range(output_seq_len + 1):
+        decoder_inputs.append(tf.placeholder(tf.int32, shape=[None], name="decoder{0}".format(i)))
+    for i in range(output_seq_len):
+        target_weights.append(tf.placeholder(tf.float32, shape=[None], name="weight{0}".format(i)))
+
+    targets = [decoder_inputs[i + 1] for i in range(output_seq_len)]
+
+    cell = tf.contrib.rnn.BasicLSTMCell(size)
+
+    outputs, _ = seq2seq.embedding_attention_seq2seq(
+        encoder_inputs,
+        decoder_inputs[:output_seq_len],
+        cell,
+        num_encoder_symbols=num_encoder_symbols,
+        num_decoder_symbols=num_decoder_symbols,
+        embedding_size=size,
+        output_projection=None,
+        feed_previous=feed_previous,
+        dtype=tf.float32)
+
+    loss = seq2seq.sequence_loss(outputs, targets, target_weights)
+    opt = tf.train.GradientDescentOptimizer(learning_rate)
+    update = opt.apply_gradients(opt.compute_gradients(loss))
+    saver = tf.train.Saver(tf.global_variables())
+
+    return encoder_inputs, decoder_inputs, target_weights, outputs, loss, update, saver, learning_rate_decay_op, learning_rate
+
+
+def train():
+    train_set = get_train_set()
+    with tf.Session() as sess:
+
+        sample_encoder_inputs, sample_decoder_inputs, sample_target_weights = get_samples(train_set)
+        encoder_inputs, decoder_inputs, target_weights, outputs, loss, update, saver, learning_rate_decay_op, learning_rate = get_model()
+
+        input_feed = {}
+        for l in range(input_seq_len):
+            input_feed[encoder_inputs[l].name] = sample_encoder_inputs[l]
+        for l in range(output_seq_len):
+            input_feed[decoder_inputs[l].name] = sample_decoder_inputs[l]
+            input_feed[target_weights[l].name] = sample_target_weights[l]
+        input_feed[decoder_inputs[output_seq_len].name] = np.zeros([len(sample_decoder_inputs[0])], dtype=np.int32)
+
+        sess.run(tf.global_variables_initializer())
+
+        previous_losses = []
+        for step in range(20700):
+            [loss_ret, _] = sess.run([loss, update], input_feed)
+            if step % 10 == 0:
+                print('step=', step, 'loss=', loss_ret, 'learning_rate=', learning_rate.eval())
+
+                if len(previous_losses) > 5 and loss_ret > max(previous_losses[-5:]):
+                    sess.run(learning_rate_decay_op)
+                previous_losses.append(loss_ret)
+
+                saver.save(sess, './model/EvilCalf')
+
+
+if __name__ == "__main__":
+    train()
+
+\end{lstlisting}
+\begin{lstlisting}[
+    language=java,
+    label=code:predict,
+    caption=预测模型
+]
+# coding:utf-8
+import sys
+import numpy as np
+import tensorflow as tf
+from tensorflow.contrib.legacy_seq2seq.python.ops import seq2seq
+import word_token
+import jieba
+import win_unicode_console
+
+win_unicode_console.enable()
+
+input_seq_len = 5
+output_seq_len = 5
+PAD_ID = 0
+GO_ID = 1
+EOS_ID = 2
+size = 8
+init_learning_rate = 1
+wordToken = word_token.WordToken()
+max_token_id = wordToken.load_file_list(['question', 'answer'])
+num_encoder_symbols = max_token_id + 5
+num_decoder_symbols = max_token_id + 5
+
+
+def get_id_list_from(sentence):
+    sentence_id_list = []
+    seg_list = jieba.cut(sentence)
+    for str in seg_list:
+        id = wordToken.word2id(str)
+        if id:
+            sentence_id_list.append(wordToken.word2id(str))
+    return sentence_id_list
+
+
+def seq_to_encoder(input_seq):
+    input_seq_array = [int(v) for v in input_seq.split()]
+    encoder_input = [PAD_ID] * (input_seq_len - len(input_seq_array)) + input_seq_array
+    decoder_input = [GO_ID] + [PAD_ID] * (output_seq_len - 1)
+    encoder_inputs = [np.array([v], dtype=np.int32) for v in encoder_input]
+    decoder_inputs = [np.array([v], dtype=np.int32) for v in decoder_input]
+    target_weights = [np.array([1.0], dtype=np.float32)] * output_seq_len
+    return encoder_inputs, decoder_inputs, target_weights
+
+
+def get_model(feed_previous=False):
+    learning_rate = tf.Variable(float(init_learning_rate), trainable=False, dtype=tf.float32)
+    learning_rate_decay_op = learning_rate.assign(learning_rate * 0.9)
+
+    encoder_inputs = []
+    decoder_inputs = []
+    target_weights = []
+    for i in range(input_seq_len):
+        encoder_inputs.append(tf.placeholder(tf.int32, shape=[None], name="encoder{0}".format(i)))
+    for i in range(output_seq_len + 1):
+        decoder_inputs.append(tf.placeholder(tf.int32, shape=[None], name="decoder{0}".format(i)))
+    for i in range(output_seq_len):
+        target_weights.append(tf.placeholder(tf.float32, shape=[None], name="weight{0}".format(i)))
+
+    targets = [decoder_inputs[i + 1] for i in range(output_seq_len)]
+
+    cell = tf.contrib.rnn.BasicLSTMCell(size)
+
+    outputs, _ = seq2seq.embedding_attention_seq2seq(
+        encoder_inputs,
+        decoder_inputs[:output_seq_len],
+        cell,
+        num_encoder_symbols=num_encoder_symbols,
+        num_decoder_symbols=num_decoder_symbols,
+        embedding_size=size,
+        output_projection=None,
+        feed_previous=feed_previous,
+        dtype=tf.float32)
+
+    loss = seq2seq.sequence_loss(outputs, targets, target_weights)
+    opt = tf.train.GradientDescentOptimizer(learning_rate)
+    update = opt.apply_gradients(opt.compute_gradients(loss))
+    saver = tf.train.Saver(tf.global_variables())
+
+    return encoder_inputs, decoder_inputs, target_weights, outputs, loss, update, saver, learning_rate_decay_op, learning_rate
+
+
+def predict():
+    with tf.Session() as sess:
+        encoder_inputs, decoder_inputs, target_weights, outputs, loss, update, saver, learning_rate_decay_op, learning_rate = get_model(
+            feed_previous=True)
+        saver.restore(sess, './model/EvilCalf')
+        sys.stdout.write("> ")
+        sys.stdout.flush()
+        input_seq = sys.stdin.readline()
+        while input_seq:
+            input_seq = input_seq.strip()
+            input_id_list = get_id_list_from(input_seq)
+            if len(input_id_list):
+                sample_encoder_inputs, sample_decoder_inputs, sample_target_weights = seq_to_encoder(
+                    ' '.join([str(v) for v in input_id_list]))
+
+                input_feed = {}
+                for l in range(input_seq_len):
+                    input_feed[encoder_inputs[l].name] = sample_encoder_inputs[l]
+                for l in range(output_seq_len):
+                    input_feed[decoder_inputs[l].name] = sample_decoder_inputs[l]
+                    input_feed[target_weights[l].name] = sample_target_weights[l]
+                input_feed[decoder_inputs[output_seq_len].name] = np.zeros([2], dtype=np.int32)
+
+                outputs_seq = sess.run(outputs, input_feed)
+                outputs_seq = [int(np.argmax(logit[0], axis=0)) for logit in outputs_seq]
+                if EOS_ID in outputs_seq:
+                    outputs_seq = outputs_seq[:outputs_seq.index(EOS_ID)]
+                outputs_seq = [wordToken.id2word(v) for v in outputs_seq]
+                print(" ".join(outputs_seq))
+            else:
+                print("换句话吧，这句话无解，GG")
+
+            sys.stdout.write("> ")
+            sys.stdout.flush()
+            input_seq = sys.stdin.readline()
+
+
+if __name__ == "__main__":
+    predict()
+
+\end{lstlisting}
+\end{appendices}
