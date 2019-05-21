@@ -367,7 +367,8 @@ encoder_input_0 = [PAD_ID] * (input_seq_len - len(train_set[0][0])) + train_set[
 ]
 encoder_input_1 = [PAD_ID] * (input_seq_len - len(train_set[1][0])) + train_set[1][0]
 \end{lstlisting}
-=需要用一个GO\_ID来作为decoder\_input的起始，再输入样本序列，最后填充PAD\_ID，即
+
+需要用一个GO\_ID来作为decoder\_input的起始，再输入样本序列，最后填充PAD\_ID，即
 \begin{lstlisting}[
     language=python,
     label=,
@@ -502,6 +503,7 @@ target_weights = []
                           name="weight{0}".format(i)))
 )
 \end{lstlisting}
+
 计算得出的损失值就是：
 \begin{lstlisting}[
     language=python,
