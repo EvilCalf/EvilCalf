@@ -327,6 +327,7 @@ array([5, 0, 2, 5], dtype=int32),
 array([0, 7, 0, 6], dtype=int32), 
 array([0, 0, 1, 6], dtype=int32)]
 \end{lstlisting}
+
 其中的5个array，表示一句话的长度是5个词
 
 其中每个array里数的个数就是batch的大小，也就是一共4个样本。那么从中就可以看出第一个样本是[[0],[0],[5],[0],[0]]，第二个样本是[[0],[0],[0],[7],[0]]，这里的数字也就是所谓的ID。同理，参数decoder\_inputs也是和encoder\_inputs一样结构。
@@ -368,7 +369,7 @@ encoder_input_0 = [PAD_ID] * (input_seq_len - len(train_set[0][0])) + train_set[
 encoder_input_1 = [PAD_ID] * (input_seq_len - len(train_set[1][0])) + train_set[1][0]
 \end{lstlisting}
 
-需要用一个GO\_ID来作为decoder\_input的起始，再输入样本序列，最后填充PAD\_ID，即
+需要用一个GO\_ID来作为decoder\_input的起始，再输入样本序列，最后填充PAD\_ID，即:
 \begin{lstlisting}[
     language=python,
     label=,
