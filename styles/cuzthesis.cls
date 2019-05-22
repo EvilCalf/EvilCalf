@@ -638,7 +638,9 @@
     \renewcommand{\baselinestretch}{1.3}
     \setlength{\parskip}{0.4\baselineskip}
     \selectfont
-}{}
+}{
+    \par
+}
 %---------------------------------------------------------------------------%
 %->> Customized bibliography settings
 %---------------------------------------------------------------------------%
